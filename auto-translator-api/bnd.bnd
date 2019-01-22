@@ -1,0 +1,5 @@
+Bundle-Name: translate-api
+Bundle-SymbolicName: com.liferay.demo.auto.translate.api
+Bundle-Version: 1.0.0
+
+Export-Package: com.liferay.demo.auto.translate.api

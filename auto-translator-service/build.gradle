@@ -1,0 +1,35 @@
+buildscript {
+	dependencies {
+		classpath group: "com.liferay", name: "com.liferay.gradle.plugins", version: "3.9.9"
+	}
+
+	repositories {
+		maven {
+			url "https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public"
+		}
+	}
+}
+
+//apply plugin: "com.liferay.plugin"
+
+dependencies {
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "3.0.0"
+	compileOnly group: "org.osgi", name: "osgi.cmpn", version: "6.0.0"
+
+	compileOnly project(":modules:auto-translator:auto-translator-api")
+
+	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk
+	compileInclude group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.484'
+	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-translate
+	compileInclude group: 'com.amazonaws', name: 'aws-java-sdk-translate', version: '1.11.484'
+
+
+}
+
+repositories {
+	mavenLocal()
+
+	maven {
+		url "https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public"
+	}
+}
