@@ -4,6 +4,7 @@ First make sure to add the following properties to your portal-ext.properties or
 ```
 aws.accessKeyId=AKIA....
 aws.secretKey=aa....
+aws.region=eu-west-1
 ```
 
 
@@ -11,7 +12,11 @@ You can use this module in two ways:
 
 1. Add a tag 'autotranslate' to your webcontent item and it will translate the title from en_US to each enabled language
 
+
+
 2. Use it realtime (need to add some caching) in webcontent templates
+
+**WARNING**: Before you can use the following snippet make sure the "serviceLocator" is not under your freemarker restricted values. To check that go to Control panel >> System settings >> template engine and under "free marker engine" , remove the "serviceLocator" from restricted values.
 
 ```
 <#if locale.getLanguage() == "en" >

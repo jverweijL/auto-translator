@@ -25,7 +25,6 @@ import java.util.Locale;
 	service = TranslateService.class
 )
 public class TranslateServiceImpl implements TranslateService {
-	private static final String REGION = "eu-west-1";
 
 	@Override
 	public String doTranslateWithLocale(Locale locale, String value) {
@@ -44,7 +43,7 @@ public class TranslateServiceImpl implements TranslateService {
 
 			AmazonTranslate translate = AmazonTranslateClient.builder()
 					.withCredentials(new AWSStaticCredentialsProvider(awsCreds))
-					.withRegion(REGION)
+					.withRegion(PortalUtil.getPortalProperties().getProperty("aws.region"))
 					.build();
 
 			TranslateTextRequest request = new TranslateTextRequest()

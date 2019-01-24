@@ -43,7 +43,7 @@ import java.util.Set;
 public class AutoTranslatorJournalMessageListener implements MessageListener {
 
     private long WAITTIME = 2000;
-    private static final String REGION = "eu-west-1";
+
 
     @Override
     public void receive(Message message) throws MessageListenerException {
@@ -104,35 +104,7 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
         }
     }
 
-    /*public String doTranslate(Locale locale, String value) {
-        try {
-            _log.debug("Translate from [en] to [" + locale.getLanguage() + "]: " + value);
-
-            // Create credentials using a provider chain. For more information, see
-            // https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html
-            BasicAWSCredentials awsCreds = new BasicAWSCredentials("AKIAJA3ZFBA3DI7RUTSQ", "aa8Z6d9GvqANh3OflXNVGw/bF63v+qLuOON/YS58");
-            //AWSCredentialsProvider awsCreds = DefaultAWSCredentialsProviderChain.getInstance();
-
-            AmazonTranslate translate = AmazonTranslateClient.builder()
-                    .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
-                    .withRegion(REGION)
-                    .build();
-
-            TranslateTextRequest request = new TranslateTextRequest()
-                    .withText(value)
-                    .withSourceLanguageCode("en")
-                    .withTargetLanguageCode(locale.getLanguage());
-            TranslateTextResult result  = translate.translateText(request);
-            _log.debug(result.getTranslatedText());
-            return result.getTranslatedText();
-
-        } catch (Exception ex) {
-            _log.error("Error: " + ex.getMessage());
-            return "";
-        }
-    }*/
-
-    public boolean mustbeTranslated(AssetEntry entry) throws PortalException {
+      public boolean mustbeTranslated(AssetEntry entry) throws PortalException {
         //only autotag if there's an autotag tag or if it's empty
         String triggerTagName = "autotranslate";
         if (triggerTagName.isEmpty()) {
