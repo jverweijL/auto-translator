@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<root available-locales="nl_NL,en_US" default-locale="en_US">_
+    <dynamic-element name="content" type="text_area" index-type="text" instance-id="ceny">
+        <dynamic-content language-id="nl_NL">
+            <![CDATA[<p>Laat me deze content vertalen</p>]]>
+        </dynamic-content>
+        <dynamic-content language-id="en_US">
+            <![CDATA[<p>Let me translate this content</p>]]></dynamic-content>_
+    </dynamic-element>
+</root>
+
+content:
+<?xml version="1.0"?>
+    <root available-locales="nl_NL,en_US" default-locale="en_US">
+        <dynamic-element name="content" type="text_area" index-type="text" instance-id="ceny">
+            <dynamic-content language-id="nl_NL"><![CDATA[<p>Laat me deze content vertalen</p>]]></dynamic-content>
+            <dynamic-content language-id="en_US"><![CDATA[<p>Let me translate this content</p>]]></dynamic-content>
+        </dynamic-element>
+    </root>
+
+content by default locale:
+<?xml version="1.0" encoding="UTF-8"?>
+    <root available-locales="nl_NL,en_US" default-locale="en_US">
+        <dynamic-element name="content" type="text_area" index-type="text" instance-id="ceny">
+            <dynamic-content language-id="en_US"><![CDATA[<p>Let me translate this content</p>]]></dynamic-content>
+        </dynamic-element>
+    </root>

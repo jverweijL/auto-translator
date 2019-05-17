@@ -7,6 +7,6 @@ import java.util.Locale;
  */
 public interface TranslateService {
 
-    public String doTranslateWithLocale(Locale locale, String value);
-    public String doTranslate(String language, String value);
+    public String doTranslateWithLocale(Locale from, Locale to, String value);
+    public String doTranslate(String fromLanguage, String toLanguage, String value);
 }

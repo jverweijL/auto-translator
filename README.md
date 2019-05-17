@@ -23,6 +23,6 @@ You can use this module in two ways:
   ${.vars['reserved-article-title'].data}
 <#else>
   <#assign translateService = serviceLocator.findService("com.liferay.demo.auto.translate.api.TranslateService") /> 
-  ${translateService.doTranslate(locale.getLanguage(),.vars['reserved-article-title'].data)} 
+  ${translateService.doTranslate("en",locale.getLanguage(),.vars['reserved-article-title'].data)} 
 </#if>
 ```

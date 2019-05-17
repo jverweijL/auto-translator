@@ -27,14 +27,14 @@ import java.util.Locale;
 public class TranslateServiceImpl implements TranslateService {
 
 	@Override
-	public String doTranslateWithLocale(Locale locale, String value) {
-		return this.doTranslate(locale.getLanguage(),value);
+	public String doTranslateWithLocale(Locale from,Locale to, String value) {
+		return this.doTranslate(from.getLanguage(),to.getLanguage(),value);
 	}
 
 	@Override
-	public String doTranslate(String language, String value) {
+	public String doTranslate(String fromLanguage, String toLanguage, String value) {
 		try {
-			_log.debug("Translate from [en] to [" + language + "]: " + value);
+			_log.debug("Translate from [" + fromLanguage + "] to [" + toLanguage + "]: " + value);
 
 			// Create credentials using a provider chain. For more information, see
 			// https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html
@@ -48,8 +48,8 @@ public class TranslateServiceImpl implements TranslateService {
 
 			TranslateTextRequest request = new TranslateTextRequest()
 					.withText(value)
-					.withSourceLanguageCode("en")
-					.withTargetLanguageCode(language);
+					.withSourceLanguageCode(fromLanguage)
+					.withTargetLanguageCode(toLanguage);
 			TranslateTextResult result  = translate.translateText(request);
 			_log.debug(result.getTranslatedText());
 			return result.getTranslatedText();

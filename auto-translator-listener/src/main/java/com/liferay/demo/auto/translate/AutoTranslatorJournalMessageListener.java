@@ -22,14 +22,13 @@ import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.xml.Document;
-import com.liferay.portal.kernel.xml.DocumentException;
-import com.liferay.portal.kernel.xml.Node;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.xml.*;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 import java.util.Locale;
@@ -59,8 +58,12 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
         JournalArticle article = null;
         AssetEntry entry = null;
         try {
-            article = _JournalArticleLocalService.getArticle((long)message.get("groupId"),(String)message.get("articleId"));
+            long groupid = (long)message.get("groupId");
+            Locale defaultLocale = PortalUtil.getSiteDefaultLocale(groupid);
+            article = _JournalArticleLocalService.getArticle(groupid,(String)message.get("articleId"));
             entry = _AssetEntryLocalService.getEntry(JournalArticle.class.getName(),article.getResourcePrimKey());
+            final Set<Locale> availableLocales = LanguageUtil.getAvailableLocales(groupid);
+
 
             ServiceContext serviceContext = new ServiceContext();
             serviceContext.setCompanyId(entry.getCompanyId());
@@ -74,9 +77,9 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
                     Map<Locale, String> titleMap = article.getTitleMap();
 
                     for (Locale locale : LanguageUtil.getAvailableLocales(article.getGroupId())) {
-                        // TODO lookup default locale and skip this.
-                        if (!locale.equals(Locale.US)) {
-                            String result = _TranslateService.doTranslate(locale.getLanguage(), article.getTitle());
+                        if (!locale.equals(defaultLocale)) {
+                            // translate title
+                            String result = _TranslateService.doTranslate(defaultLocale.getLanguage(), locale.getLanguage(), article.getTitle());
                             if (!result.isEmpty()) {
                                 _log.debug("translation for " + locale.getLanguage() + ":  " + result);
                                 if (titleMap.containsKey(locale)) {
@@ -85,6 +88,28 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
                                     titleMap.put(locale,result);
                                 }
                             }
+
+                            // translate content
+                            Boolean overwriteTranslation = Boolean.getBoolean(PortalUtil.getPortalProperties().getProperty("aws.translate.override","false"));
+                            SAXReader reader = SAXReaderUtil.getSAXReader();
+                            Document document;
+                            if (overwriteTranslation) {
+                                document = reader.read(article.getContentByLocale(defaultLocale.getLanguage()));
+                            } else {
+                                document = reader.read(article.getContent());
+                            }
+
+                            // TODO process document element by element
+                            ///liferay/development/sources/liferay71/liferay-portal/modules/apps/adaptive-media/adaptive-media-web/src/main/java/com/liferay/adaptive/media/web/internal/upgrade/v1_0_0/UpgradeJournalArticleDataFileEntryId.java
+                            XPath xPath = SAXReaderUtil.createXPath(
+                                    "//dynamic-element[@type='text_area']");
+                            List<Node> nodes = xPath.selectNodes(document);
+
+                            for (Node node : nodes) {
+
+                            }
+
+                            article.setContent(document.compactString());
                         }
                     }
 
@@ -99,12 +124,48 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
                                                               serviceContext);
                 }
             }
-        } catch (PortalException e) {
+        } catch (PortalException | DocumentException | IOException e) {
             e.printStackTrace();
         }
     }
 
-      public boolean mustbeTranslated(AssetEntry entry) throws PortalException {
+    /*public static void translateElement(Element ele, AmazonTranslate translate) {
+
+        // Check if the element has any text
+        if (!ele.ownText().isEmpty()) {
+
+            // Retrieve the text of the HTML element
+            String text = ele.ownText();
+
+            // Now translate the element's text
+            try {
+
+                // Translate from English to Spanish
+                TranslateTextRequest request = new TranslateTextRequest()
+                        .withText(text)
+                        .withSourceLanguageCode("en")
+                        .withTargetLanguageCode("es");
+
+                // Retrieve the result
+                TranslateTextResult result  = translate.translateText(request);
+
+                // Record the original and translated text
+                System.out.println("Original text: " + text + " - Translated text: "+ result.getTranslatedText());
+
+                // Update the HTML element with the translated text
+                ele.text(result.getTranslatedText());
+
+                // Catch any translation errors
+            } catch (AmazonServiceException e) {
+                System.err.println(e.getErrorMessage());
+                System.exit(1);
+            }
+        } else {
+            // We have found a non-text HTML element. No action required.
+        }
+    }*/
+
+    public boolean mustbeTranslated(AssetEntry entry) throws PortalException {
         //only autotag if there's an autotag tag or if it's empty
         String triggerTagName = "autotranslate";
         if (triggerTagName.isEmpty()) {
@@ -126,6 +187,8 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
 
     @Reference(cardinality = ReferenceCardinality.MANDATORY)
     protected TranslateService _TranslateService;
+
+
 
 
     private static final Log _log = LogFactoryUtil.getLog(AutoTranslatorJournalMessageListener.class);
