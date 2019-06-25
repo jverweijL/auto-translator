@@ -1,6 +1,6 @@
 buildscript {
 	dependencies {
-		classpath group: "com.liferay", name: "com.liferay.gradle.plugins", version: "3.13.26"
+		classpath group: "com.liferay", name: "com.liferay.gradle.plugins", version: "4.0.5"
 	}
 
 	repositories {
@@ -12,9 +12,16 @@ buildscript {
 
 
 dependencies {
-	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "3.0.0"
+	//compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "3.0.0"
 		
-	compileOnly group: "org.osgi", name: "osgi.cmpn", version: "6.0.0"
+	//compileOnly group: "org.osgi", name: "osgi.cmpn", version: "6.0.0"
+
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "4.4.0"
+	compileOnly group: "org.osgi", name: "org.osgi.service.component.annotations", version: "1.3.0"
+
+	//compileOnly group: "org.osgi", name: "org.osgi.core"
+	compileOnly 'org.osgi:org.osgi.core:6.0.0'
+
 	compileOnly group: 'com.liferay', name: 'com.liferay.journal.api', version: '3.0.0'
 	compileOnly group: 'org.osgi', name: 'org.osgi.framework', version: '1.9.0'
 
