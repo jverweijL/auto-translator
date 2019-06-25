@@ -25,4 +25,6 @@ Import-Package: \
     !org.springframework.test.context.junit4*,\
     !sun.security.util*,\
     !sun.security.x509*,\
+    !com.sun.org.apache.xpath*,\
+    !kotlin*,\
     *

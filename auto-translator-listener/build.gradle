@@ -22,7 +22,7 @@ dependencies {
 	//compileOnly group: "org.osgi", name: "org.osgi.core"
 	//compileOnly 'org.osgi:org.osgi.core:6.0.0'
 
-	compileOnly group: 'com.liferay', name: 'com.liferay.journal.api', version: '3.0.0'
+	compileOnly group: 'com.liferay', name: 'com.liferay.journal.api'
 	compileOnly group: 'org.osgi', name: 'org.osgi.framework', version: '1.9.0'
 
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
@@ -33,9 +33,9 @@ dependencies {
 	compileInclude group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.7'
 
 	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk
-	compileInclude group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.484'
+	compileInclude group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.579'
 	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-translate
-	compileInclude group: 'com.amazonaws', name: 'aws-java-sdk-translate', version: '1.11.484'
+	compileInclude group: 'com.amazonaws', name: 'aws-java-sdk-translate', version: '1.11.579'
 
 	compileOnly project(":modules:auto-translator:auto-translator-api")
 
