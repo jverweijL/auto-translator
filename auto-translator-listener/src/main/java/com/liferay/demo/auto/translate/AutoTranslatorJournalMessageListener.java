@@ -38,9 +38,10 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
     public void receive(Message message) throws MessageListenerException {
 
         //TODO read fields from config or make it more flexible
-        ArrayList<String> fields = new ArrayList<String>();
-        fields.add("responsibilities");
-        fields.add("content");
+        ArrayList<String> fields = new ArrayList( Arrays.asList( PortalUtil.getPortalProperties().getProperty("translate.fields").split("\\s*,\\s*")));
+                //new ArrayList<String>();
+        //fields.add("responsibilities");
+        //fields.add("content");
 
         try {
             _log.debug("Let's wait " + WAITTIME + " milliseconds..");
@@ -48,7 +49,6 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
 
         JournalArticle article = null;
         AssetEntry entry = null;
@@ -72,6 +72,8 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
                     Map<Locale, String> titleMap = article.getTitleMap();
                     SAXReader reader = SAXReaderUtil.getSAXReader();
                     Document document = reader.read(article.getContentByLocale(defaultLocale.getLanguage()));
+
+                    _log.debug("Original XML: " + document.asXML());
 
                     for (Locale locale : LanguageUtil.getAvailableLocales(article.getGroupId())) {
                         if (!locale.equals(defaultLocale)) {
@@ -101,7 +103,7 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
 
                                     org.jsoup.nodes.Document soup = Jsoup.parse(text);
 
-                                    Elements eles = soup.select("*");
+                                    Elements eles = soup.getAllElements();
 
                                     // For each element
                                     for (org.jsoup.nodes.Element ele : eles) {
@@ -113,9 +115,6 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
                                             _log.debug("Translate to: " + res);
                                             ele.text(res);
 
-                                            // Translate the element
-                                            //translateElement(ele, translate);
-
                                             // If you encounter service throttling when translating large web
                                             // pages, you can request a service limit increase. For details,
                                             // see https://aws.amazon.com/premiumsupport/knowledge-center/manage-service-limits/,
@@ -123,8 +122,6 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
                                             // Thread.sleep(1000);
                                         }
                                     }
-
-                                    //TODO remove old language/locale
 
                                     Element parent = n.getParent();
                                     Element tn = n.createCopy();
@@ -135,11 +132,6 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
                                     _log.debug("new node text" + tn.getText());
                                     parent.add(tn);
                                     _log.debug("new parent" + parent.formattedString());
-
-                                    //article.setContent(parent.formattedString());
-                                    //_JournalArticleLocalService.updateArticle(article.getUserId(),article.getGroupId(),article.getFolderId(),article.getArticleId(),article.getVersion(),parent.formattedString(),serviceContext);
-
-
                                     _log.debug("Selected text: " + text);
                                 } catch (IOException | NullPointerException e) {
                                     _log.error(e.getMessage());
@@ -164,42 +156,6 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
         }
     }
 
-    /*public static void translateElement(Element ele, AmazonTranslate translate) {
-
-        // Check if the element has any text
-        if (!ele.ownText().isEmpty()) {
-
-            // Retrieve the text of the HTML element
-            String text = ele.ownText();
-
-            // Now translate the element's text
-            try {
-
-                // Translate from English to Spanish
-                TranslateTextRequest request = new TranslateTextRequest()
-                        .withText(text)
-                        .withSourceLanguageCode("en")
-                        .withTargetLanguageCode("es");
-
-                // Retrieve the result
-                TranslateTextResult result  = translate.translateText(request);
-
-                // Record the original and translated text
-                System.out.println("Original text: " + text + " - Translated text: "+ result.getTranslatedText());
-
-                // Update the HTML element with the translated text
-                ele.text(result.getTranslatedText());
-
-                // Catch any translation errors
-            } catch (AmazonServiceException e) {
-                System.err.println(e.getErrorMessage());
-                System.exit(1);
-            }
-        } else {
-            // We have found a non-text HTML element. No action required.
-        }
-    }*/
-
     public boolean mustbeTranslated(AssetEntry entry) throws PortalException {
         //only autotag if there's an autotag tag or if it's empty
         String triggerTagName = "autotranslate";
@@ -222,9 +178,6 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
 
     @Reference(cardinality = ReferenceCardinality.MANDATORY)
     protected TranslateService _TranslateService;
-
-
-
 
     private static final Log _log = LogFactoryUtil.getLog(AutoTranslatorJournalMessageListener.class);
 }

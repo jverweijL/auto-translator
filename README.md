@@ -5,6 +5,7 @@ First make sure to add the following properties to your portal-ext.properties or
 aws.accessKeyId=AKIA....
 aws.secretKey=aa....
 aws.region=eu-west-1
+translate.fields=content,fieldA,fieldB
 ```
 
 
