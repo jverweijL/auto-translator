@@ -1,11 +1,5 @@
 package com.liferay.demo.auto.translate;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.translate.AmazonTranslate;
-import com.amazonaws.services.translate.AmazonTranslateClient;
-import com.amazonaws.services.translate.model.TranslateTextRequest;
-import com.amazonaws.services.translate.model.TranslateTextResult;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
@@ -13,7 +7,6 @@ import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
 import com.liferay.demo.auto.translate.api.TranslateService;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
-import com.liferay.journal.service.JournalArticleService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -24,16 +17,14 @@ import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.xml.*;
+import org.jsoup.Jsoup;
+import org.jsoup.select.Elements;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Component(
         immediate=true,property=("destination.name=" + AutoTranslatorConfigurator.DESTINATION),
@@ -43,9 +34,13 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
 
     private long WAITTIME = 2000;
 
-
     @Override
     public void receive(Message message) throws MessageListenerException {
+
+        //TODO read fields from config or make it more flexible
+        ArrayList<String> fields = new ArrayList<String>();
+        fields.add("responsibilities");
+        fields.add("content");
 
         try {
             _log.debug("Let's wait " + WAITTIME + " milliseconds..");
@@ -75,6 +70,8 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
                     // fields we will translate
                     // for now just title and summary/description
                     Map<Locale, String> titleMap = article.getTitleMap();
+                    SAXReader reader = SAXReaderUtil.getSAXReader();
+                    Document document = reader.read(article.getContentByLocale(defaultLocale.getLanguage()));
 
                     for (Locale locale : LanguageUtil.getAvailableLocales(article.getGroupId())) {
                         if (!locale.equals(defaultLocale)) {
@@ -90,26 +87,64 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
                             }
 
                             // translate content
-                            Boolean overwriteTranslation = Boolean.getBoolean(PortalUtil.getPortalProperties().getProperty("aws.translate.override","false"));
-                            SAXReader reader = SAXReaderUtil.getSAXReader();
-                            Document document;
-                            if (overwriteTranslation) {
-                                document = reader.read(article.getContentByLocale(defaultLocale.getLanguage()));
-                            } else {
-                                document = reader.read(article.getContent());
+                            for (String fieldname : fields) {
+                                try {
+                                    //TODO verify whether field IS translatable
+                                    _log.debug("Translating field " + fieldname);
+
+                                    //<dynamic-element name='Responsibilities'
+                                    XPath xPath = SAXReaderUtil.createXPath(
+                                            "//dynamic-element[lower-case(@name)='" + fieldname + "']/dynamic-content[@language-id='" + defaultLocale.toString() + "']");
+                                    Element n = (Element)xPath.selectSingleNode(document);
+
+                                    String text = n.getText();
+
+                                    org.jsoup.nodes.Document soup = Jsoup.parse(text);
+
+                                    Elements eles = soup.select("*");
+
+                                    // For each element
+                                    for (org.jsoup.nodes.Element ele : eles) {
+
+                                        if (!ele.ownText().isEmpty()) {
+                                            String elementText = ele.ownText();
+                                            _log.debug("Let's translate: " + elementText);
+                                            String res = _TranslateService.doTranslate(defaultLocale.getLanguage(), locale.getLanguage(), elementText);
+                                            _log.debug("Translate to: " + res);
+                                            ele.text(res);
+
+                                            // Translate the element
+                                            //translateElement(ele, translate);
+
+                                            // If you encounter service throttling when translating large web
+                                            // pages, you can request a service limit increase. For details,
+                                            // see https://aws.amazon.com/premiumsupport/knowledge-center/manage-service-limits/,
+                                            // or you can throttle your requests by inserting a sleep statement.
+                                            // Thread.sleep(1000);
+                                        }
+                                    }
+
+                                    //TODO remove old language/locale
+
+                                    Element parent = n.getParent();
+                                    Element tn = n.createCopy();
+                                    Attribute l = tn.attribute("language-id");
+                                    l.setValue(locale.toString());
+                                    tn.clearContent();
+                                    tn.addCDATA(soup.body().html());
+                                    _log.debug("new node text" + tn.getText());
+                                    parent.add(tn);
+                                    _log.debug("new parent" + parent.formattedString());
+
+                                    //article.setContent(parent.formattedString());
+                                    //_JournalArticleLocalService.updateArticle(article.getUserId(),article.getGroupId(),article.getFolderId(),article.getArticleId(),article.getVersion(),parent.formattedString(),serviceContext);
+
+
+                                    _log.debug("Selected text: " + text);
+                                } catch (IOException | NullPointerException e) {
+                                    _log.error(e.getMessage());
+                                }
                             }
-
-                            // TODO process document element by element
-                            ///liferay/development/sources/liferay71/liferay-portal/modules/apps/adaptive-media/adaptive-media-web/src/main/java/com/liferay/adaptive/media/web/internal/upgrade/v1_0_0/UpgradeJournalArticleDataFileEntryId.java
-                            XPath xPath = SAXReaderUtil.createXPath(
-                                    "//dynamic-element[@type='text_area']");
-                            List<Node> nodes = xPath.selectNodes(document);
-
-                            for (Node node : nodes) {
-
-                            }
-
-                            article.setContent(document.compactString());
                         }
                     }
 
@@ -119,13 +154,13 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
                                                               article.getArticleId(),
                                                               article.getVersion(),
                                                               titleMap,article.getDescriptionMap(),
-                                                              article.getContent(),
+                                                              document.asXML(),
                                                               article.getLayoutUuid(),
                                                               serviceContext);
                 }
             }
-        } catch (PortalException | DocumentException | IOException e) {
-            e.printStackTrace();
+        } catch (PortalException | DocumentException e) {
+            _log.error(e.getMessage());
         }
     }
 
