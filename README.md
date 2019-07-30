@@ -12,7 +12,7 @@ translate.fields=content,fieldA,fieldB
 You can use this module in two ways:
 
 1. Add a tag 'autotranslate' to your webcontent item and it will translate the title from en_US to each enabled language
-
+and the same for all fields configured in `translate.fields` in your portal.properties
 
 
 2. Use it realtime (need to add some caching) in webcontent templates
