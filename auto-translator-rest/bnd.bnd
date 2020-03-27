@@ -1,0 +1,4 @@
+Bundle-Name: auto-translator-rest
+Bundle-SymbolicName: com.liferay.demo.auto.translate.rest
+Bundle-Version: 1.0.0
+Liferay-Configuration-Path: /configuration
