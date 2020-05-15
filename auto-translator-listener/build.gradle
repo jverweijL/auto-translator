@@ -12,18 +12,10 @@ buildscript {
 
 
 dependencies {
-	//compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "3.0.0"
-		
-	//compileOnly group: "org.osgi", name: "osgi.cmpn", version: "6.0.0"
-
-	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel"
-	compileOnly group: "org.osgi", name: "org.osgi.service.component.annotations", version: "1.3.0"
-
-	//compileOnly group: "org.osgi", name: "org.osgi.core"
-	//compileOnly 'org.osgi:org.osgi.core:6.0.0'
-
-	compileOnly group: 'com.liferay', name: 'com.liferay.journal.api'
 	compileOnly group: 'org.osgi', name: 'org.osgi.framework', version: '1.9.0'
+	compileOnly group: "org.osgi", name: "org.osgi.service.component.annotations", version: "1.3.0"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel"
+	compileOnly group: 'com.liferay', name: 'com.liferay.journal.api'
 
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
 	compileInclude group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
@@ -32,14 +24,7 @@ dependencies {
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations
 	compileInclude group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.7'
 
-	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk
-	//compileInclude group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.579'
-	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-translate
-	//compileInclude group: 'com.amazonaws', name: 'aws-java-sdk-translate', version: '1.11.579'
-
 	compileOnly project(":modules:auto-translator:auto-translator-api")
-
-	// https://mvnrepository.com/artifact/org.jsoup/jsoup
 	compileInclude group: 'org.jsoup', name: 'jsoup', version: '1.12.1'
 
 
