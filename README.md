@@ -1,4 +1,5 @@
 Current version is for Liferay DXP 7.3
+Older versions can be found in the branches.
 
 Check AWS Translate for the exact configuration.  
 First make sure to add the following properties to your portal-ext.properties or in the console:
