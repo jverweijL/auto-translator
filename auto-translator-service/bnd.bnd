@@ -1,4 +1,4 @@
-Bundle-Name: translate-service
+Bundle-Name: auto-translate-service
 Bundle-SymbolicName: com.liferay.demo.auto.translate.service
 Bundle-Version: 1.0.0
 

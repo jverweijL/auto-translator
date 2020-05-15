@@ -1,5 +1,5 @@
-Bundle-Name: auto-translator
-Bundle-SymbolicName: com.liferay.demo.auto.translate
+Bundle-Name: auto-translate-listener
+Bundle-SymbolicName: com.liferay.demo.auto.translate.listener
 Bundle-Version: 1.0.0
 
 Import-Package: \
