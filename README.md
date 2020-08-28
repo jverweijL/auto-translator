@@ -1,3 +1,9 @@
+WARNING: WATCH OUT FOR HIGH BILLING
+In some specific situation the module will keep requesting translations.
+Still need to look into this.
+For the time being make sure you set billing alerts and automatically disable the AWS keys each hour or day at the most.
+
+
 Current version is for Liferay DXP 7.3
 Older versions can be found in the branches.
 
