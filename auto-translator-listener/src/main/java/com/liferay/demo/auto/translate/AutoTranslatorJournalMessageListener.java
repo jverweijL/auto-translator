@@ -66,7 +66,7 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
 
             if (article != null) {
 
-                if (mustbeTranslated(entry)) {
+                if (mustbeTranslated(entry)  && article.getVersion() < 1.20) {
                     // fields we will translate
                     // for now just title and summary/description
                     Map<Locale, String> titleMap = article.getTitleMap();
