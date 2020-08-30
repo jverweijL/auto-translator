@@ -159,14 +159,18 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
     public boolean mustbeTranslated(AssetEntry entry) throws PortalException {
         //only autotag if there's an autotag tag or if it's empty
         String triggerTagName = "autotranslate";
+        Boolean mustTranslate = false;
+
         if (triggerTagName.isEmpty()) {
             _log.debug("No trigger tagname found");
-            return true;
+            return mustTranslate;
         } else {
             _log.debug("Checking entry for tag " + triggerTagName);
             AssetTag triggerTag = AssetTagLocalServiceUtil.getTag(entry.getGroupId(), triggerTagName);
             _log.debug("Entry has triggertag: " + entry.getTags().contains(triggerTag));
-            return entry.getTags().contains(triggerTag);
+            mustTranslate = entry.getTags().contains(triggerTag);
+            AssetTagLocalServiceUtil.deleteAssetEntryAssetTag(entry.getEntryId(),triggerTag);
+            return mustTranslate;
         }
     }
 
