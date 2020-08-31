@@ -1,8 +1,13 @@
-**WARNING: WATCH OUT FOR HIGH BILLING**  
-In some specific situation the module will keep requesting translations.  
-Still need to look into this.  
-For the time being make sure you set billing alerts and automatically disable the AWS keys each hour or day at the most.  
+**WARNING**  
+There have been reports of increased billing by AWS.    
+This might be caused by a bug either in this module or within Liferay DXP/CE.  
+So far I wasn't able to reproduce but included some additional measures trying to prevent this:  
 
+- webcontent version should be < 2.0
+- webcontent will not be translated once it has been translated for 3x waittime (3x 10 seconds by default)
+- triggertag is explicitly removed
+
+**INSTRUCTIONS**  
 
 Current version is for Liferay DXP 7.3
 Older versions can be found in the branches.
