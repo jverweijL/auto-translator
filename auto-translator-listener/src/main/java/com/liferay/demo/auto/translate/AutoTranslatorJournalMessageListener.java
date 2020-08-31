@@ -1,5 +1,8 @@
 package com.liferay.demo.auto.translate;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
@@ -19,12 +22,15 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.xml.*;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Component(
         immediate=true,property=("destination.name=" + AutoTranslatorConfigurator.DESTINATION),
@@ -32,16 +38,14 @@ import java.util.*;
 )
 public class AutoTranslatorJournalMessageListener implements MessageListener {
 
-    private long WAITTIME = 2000;
+    private long WAITTIME = Long.parseLong(PortalUtil.getPortalProperties().getProperty("translate.waittime","10000"));
+    private double MAXVERSION = Double.parseDouble(PortalUtil.getPortalProperties().getProperty("translate.maxversion","1.9"));
+    private LoadingCache<Long, Long> cache;
 
     @Override
     public void receive(Message message) throws MessageListenerException {
 
-        //TODO read fields from config or make it more flexible
         ArrayList<String> fields = new ArrayList( Arrays.asList( PortalUtil.getPortalProperties().getProperty("translate.fields").split("\\s*,\\s*")));
-                //new ArrayList<String>();
-        //fields.add("responsibilities");
-        //fields.add("content");
 
         try {
             _log.debug("Let's wait " + WAITTIME + " milliseconds..");
@@ -59,16 +63,14 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
             entry = _AssetEntryLocalService.getEntry(JournalArticle.class.getName(),article.getResourcePrimKey());
             final Set<Locale> availableLocales = LanguageUtil.getAvailableLocales(groupid);
 
-
             ServiceContext serviceContext = new ServiceContext();
             serviceContext.setCompanyId(entry.getCompanyId());
             serviceContext.setScopeGroupId(article.getGroupId());
 
             if (article != null) {
 
-                if (mustbeTranslated(entry)) {
-                    // fields we will translate
-                    // for now just title and summary/description
+                if (mustbeTranslated(entry) && article.getVersion() <= MAXVERSION) {
+
                     Map<Locale, String> titleMap = article.getTitleMap();
                     SAXReader reader = SAXReaderUtil.getSAXReader();
                     Document document = reader.read(article.getContentByLocale(defaultLocale.getLanguage()));
@@ -159,15 +161,44 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
     public boolean mustbeTranslated(AssetEntry entry) throws PortalException {
         //only autotag if there's an autotag tag or if it's empty
         String triggerTagName = "autotranslate";
+        Boolean mustTranslate = false;
+
+        _log.debug("Entry ID: " + entry.getEntryId());
+
         if (triggerTagName.isEmpty()) {
             _log.debug("No trigger tagname found");
-            return true;
+            return mustTranslate;
         } else {
             _log.debug("Checking entry for tag " + triggerTagName);
             AssetTag triggerTag = AssetTagLocalServiceUtil.getTag(entry.getGroupId(), triggerTagName);
             _log.debug("Entry has triggertag: " + entry.getTags().contains(triggerTag));
-            return entry.getTags().contains(triggerTag);
+            mustTranslate = entry.getTags().contains(triggerTag);
+            AssetTagLocalServiceUtil.deleteAssetEntryAssetTag(entry.getEntryId(),triggerTag);
+            if (mustTranslate && cache.getIfPresent(entry.getEntryId()) == null) {
+                cache.getUnchecked(entry.getEntryId());
+            }
+            else if (mustTranslate && cache.getIfPresent(entry.getEntryId()) != null)
+            {
+                _log.debug("Hitting entry in cache... not translating");
+                mustTranslate = false;
+            }
+
+            return mustTranslate;
         }
+    }
+
+    @Activate
+    protected void activate(BundleContext bundleContext) {
+        System.out.println("Activating message listener");
+        System.out.println("Init cache");
+        CacheLoader<Long, Long> loader;
+        loader = new CacheLoader<Long, Long>(){
+            @Override
+            public Long load(Long key) {
+                return key;
+            }
+        };
+        cache = CacheBuilder.newBuilder().expireAfterWrite(WAITTIME*3, TimeUnit.MILLISECONDS).build(loader);
     }
 
     @Reference(cardinality = ReferenceCardinality.MANDATORY)

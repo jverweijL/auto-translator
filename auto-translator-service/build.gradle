@@ -27,9 +27,9 @@ dependencies {
 	compileOnly project(":modules:auto-translator:auto-translator-api")
 
 	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk
-	compileInclude group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.579'
+	compileInclude group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.484'
 	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-translate
-	compileInclude group: 'com.amazonaws', name: 'aws-java-sdk-translate', version: '1.11.579'
+	compileInclude group: 'com.amazonaws', name: 'aws-java-sdk-translate', version: '1.11.484'
 
 
 }
