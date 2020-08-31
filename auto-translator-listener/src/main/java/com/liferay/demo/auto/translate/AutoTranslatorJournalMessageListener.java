@@ -68,9 +68,7 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
             serviceContext.setScopeGroupId(article.getGroupId());
 
             if (article != null) {
-
                 if (mustbeTranslated(entry) && article.getVersion() <= MAXVERSION) {
-
                     Map<Locale, String> titleMap = article.getTitleMap();
                     SAXReader reader = SAXReaderUtil.getSAXReader();
                     Document document = reader.read(article.getContentByLocale(defaultLocale.getLanguage()));
