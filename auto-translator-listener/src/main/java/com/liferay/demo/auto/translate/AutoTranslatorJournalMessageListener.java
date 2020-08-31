@@ -22,12 +22,15 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.xml.*;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Component(
         immediate=true,property=("destination.name=" + AutoTranslatorConfigurator.DESTINATION),
