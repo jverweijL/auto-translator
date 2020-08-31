@@ -22,7 +22,11 @@ dependencies {
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations
 	compileInclude group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.7'
 
+	// https://mvnrepository.com/artifact/org.jsoup/jsoup
 	compileInclude group: 'org.jsoup', name: 'jsoup', version: '1.12.1'
+	
+	// https://mvnrepository.com/artifact/com.google.guava/guava
+	compileInclude group: 'com.google.guava', name: 'guava', version: '29.0-jre'
 }
 
 repositories {
