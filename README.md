@@ -1,3 +1,12 @@
+**WARNING**  
+There have been reports of increased billing by AWS.    
+This might be caused by a bug either in this module or within Liferay DXP/CE.  
+So far I wasn't able to reproduce but included some additional measures trying to prevent this:  
+
+- webcontent version should be < 2.0
+- webcontent will not be translated once it has been translated for 3x waittime (3x 10 seconds by default)
+- triggertag is explicitly removed
+
 Check AWS Translate for the exact configuration.  
 First make sure to add the following properties to your portal-ext.properties or in the console:
 
