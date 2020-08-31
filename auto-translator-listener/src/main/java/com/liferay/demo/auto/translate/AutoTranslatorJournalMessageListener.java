@@ -32,7 +32,8 @@ import java.util.*;
 )
 public class AutoTranslatorJournalMessageListener implements MessageListener {
 
-    private long WAITTIME = 2000;
+    private long WAITTIME = Long.parseLong(PortalUtil.getPortalProperties().getProperty("translate.waittime","10000"));
+    private double MAXVERSION = Double.parseDouble(PortalUtil.getPortalProperties().getProperty("translate.maxversion","1.9"));
 
     @Override
     public void receive(Message message) throws MessageListenerException {
@@ -66,7 +67,7 @@ public class AutoTranslatorJournalMessageListener implements MessageListener {
 
             if (article != null) {
 
-                if (mustbeTranslated(entry)  && article.getVersion() < 1.20) {
+                if (mustbeTranslated(entry)  && article.getVersion() <= MAXVERSION) {
                     // fields we will translate
                     // for now just title and summary/description
                     Map<Locale, String> titleMap = article.getTitleMap();
