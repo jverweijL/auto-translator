@@ -13,14 +13,13 @@ buildscript {
 //apply plugin: "com.liferay.plugin"
 
 dependencies {
-	compileOnly group: "com.liferay.portal", name: "release.portal.api", version: "7.3.1-ga2-3"
+	compileOnly group: "com.liferay.portal", name: "release.portal.api", version: "7.3.5-ga6"
 	compileOnly project(":modules:auto-translator:auto-translator-api")
 
 	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk
-	compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.816'
-
+	compileInclude group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.579'
 	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-translate
-	compile group: 'com.amazonaws', name: 'aws-java-sdk-translate', version: '1.11.816'
+	compileInclude group: 'com.amazonaws', name: 'aws-java-sdk-translate', version: '1.11.579'
 }
 
 repositories {
@@ -29,4 +28,5 @@ repositories {
 	maven {
 		url "https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public"
 	}
+
 }

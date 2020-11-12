@@ -12,7 +12,7 @@ buildscript {
 
 
 dependencies {
-	compileOnly group: "com.liferay.portal", name: "release.portal.api", version: "7.3.1-ga2-3"
+	compileOnly group: "com.liferay.portal", name: "release.portal.api", version: "7.3.5-ga6"
 	compileOnly project(":modules:auto-translator:auto-translator-api")
 
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
