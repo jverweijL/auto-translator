@@ -20,6 +20,9 @@ aws.accessKeyId=AKIA....
 aws.secretKey=aa....
 aws.region=eu-west-1
 translate.fields=content,fieldA,fieldB
+translate.waittime=10000
+# next property is to prevent service to keep recalling
+translate.maxversion=1.9
 ```
 
 
