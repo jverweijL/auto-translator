@@ -11,7 +11,7 @@ buildscript {
 }
 
 dependencies {
-	compileOnly group: "com.liferay.portal", name: "release.portal.api", version: "7.3.5-ga6"
+	compileOnly group: "com.liferay.portal", name: "release.portal.api"
 }
 
 repositories {
